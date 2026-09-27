@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}{{ domain.name }} - Website Archive Submitter{% endblock %}
+{% block content %}
+  <h2>{{ domain.name }} <span class="badge status-{{ domain.scan_status }}">{{ domain.scan_status }}</span></h2>
+  <p class="muted">
+    Base URL: {{ domain.base_url }} ·
+    Last scan started: {{ domain.last_scan_started_at.strftime('%Y-%m-%d %H:%M') if domain.last_scan_started_at else "never" }} ·
+    Last scan completed: {{ domain.last_scan_completed_at.strftime('%Y-%m-%d %H:%M') if domain.last_scan_completed_at else "—" }}
+  </p>
+
+  <section class="stats-grid">
+    <div><strong>{{ stats.total_urls }}</strong><span>URLs discovered</span></div>
+    <div><strong>{{ stats.pending }}</strong><span>Pending / queued</span></div>
+    <div><strong>{{ stats.done }}</strong><span>Queue items done</span></div>
+    <div><strong>{{ stats.failed }}</strong><span>Queue items failed</span></div>
+    <div><strong>{{ stats.successful_submissions }}</strong><span>Successful archives</span></div>
+    <div><strong>{{ stats.failed_submissions }}</strong><span>Failed submissions</span></div>
+  </section>
+
+  <section class="panel actions">
+    <form method="post" action="{{ url_for('main.trigger_scan', domain_id=domain.id) }}">
+      <button type="submit">🔄 Re-scan (find new URLs)</button>
+    </form>
+    <form method="post" action="{{ url_for('main.build_queue', domain_id=domain.id) }}" class="inline-form">
+      {% for s in services %}
+        <label class="checkbox"><input type="checkbox" name="services" value="{{ s }}" checked> {{ s }}</label>
+      {% endfor %}
+      <button type="submit">📤 Submit un-archived URLs</button>
+    </form>
+  </section>
+
+  <section class="panel">
+    <h3>Discovered URLs ({{ urls|length }} shown, most recent first)</h3>
+    <table>
+      <thead>
+        <tr><th>URL</th><th>Source</th><th>Discovered</th><th>Ever archived?</th><th></th></tr>
+      </thead>
+      <tbody>
+        {% for u in urls %}
+        <tr>
+          <td class="url-cell" title="{{ u.original_url }}">{{ u.normalized_url }}</td>
+          <td><span class="badge">{{ u.discovery_source }}</span></td>
+          <td>{{ u.discovery_timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+          <td>
+            {% if u.ever_archived() %}✅{% else %}—{% endif %}
+            {% for sub in u.submissions %}
+              {% if sub.status == "success" %}
+                <a href="{{ sub.archive_url }}" target="_blank" class="archive-link">[{{ sub.service }}]</a>
+              {% endif %}
+            {% endfor %}
+          </td>
+          <td>
+            <form method="post" action="{{ url_for('main.reachive_one', domain_id=domain.id, url_id=u.id) }}">
+              {% for s in services %}<input type="hidden" name="services" value="{{ s }}">{% endfor %}
+              <button type="submit" class="small">Re-archive</button>
+            </form>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="5">No URLs discovered yet — a scan may still be running.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+{% endblock %}

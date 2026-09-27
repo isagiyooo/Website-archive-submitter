@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block title %}Search - Website Archive Submitter{% endblock %}
+{% block content %}
+  <h2>Search the repository</h2>
+  <form method="get" action="{{ url_for('main.search') }}" class="inline-form">
+    <input type="text" name="q" value="{{ q }}" placeholder="domain or URL substring">
+    <select name="service">
+      <option value="">any service</option>
+      {% for s in services %}
+        <option value="{{ s }}" {% if s == service_filter %}selected{% endif %}>{{ s }}</option>
+      {% endfor %}
+    </select>
+    <select name="status">
+      <option value="">any status</option>
+      <option value="success" {% if status_filter == "success" %}selected{% endif %}>success</option>
+      <option value="failed" {% if status_filter == "failed" %}selected{% endif %}>failed</option>
+    </select>
+    <button type="submit">Search</button>
+  </form>
+
+  <table>
+    <thead>
+      <tr><th>Domain</th><th>URL</th><th>Discovered</th><th>Submissions</th></tr>
+    </thead>
+    <tbody>
+      {% for r in results %}
+      <tr>
+        <td>{{ r.domain.name }}</td>
+        <td class="url-cell">{{ r.normalized_url }}</td>
+        <td>{{ r.discovery_timestamp.strftime('%Y-%m-%d %H:%M') }}</td>
+        <td>
+          {% for s in r.submissions %}
+            <span class="badge {{ 'status-idle' if s.status=='success' else 'status-error' }}">
+              {{ s.service }}: {{ s.status }}
+            </span>
+            {% if s.archive_url %}<a href="{{ s.archive_url }}" target="_blank">open</a>{% endif %}
+          {% else %}
+            <span class="muted">not yet submitted</span>
+          {% endfor %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4">No matching URLs.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+{% endblock %}

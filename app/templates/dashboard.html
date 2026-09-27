@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Website Archive Submitter{% endblock %}
+{% block content %}
+  <section class="panel">
+    <h2>Add a domain</h2>
+    <form method="post" action="{{ url_for('main.add_domain') }}" class="inline-form">
+      <input type="text" name="url" placeholder="example.com or https://example.com" required>
+      <label class="checkbox"><input type="checkbox" name="allow_external"> allow external links</label>
+      <button type="submit">Add &amp; discover</button>
+    </form>
+  </section>
+
+  <section class="panel">
+    <div class="panel-header">
+      <h2>Domains</h2>
+      <span class="worker-badge">worker: {{ worker_status }}</span>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Domain</th><th>Status</th><th>URLs</th><th>Queued</th><th>Done</th>
+          <th>Failed</th><th>Success (archives)</th><th>Last scan</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for domain, stats in rows %}
+        <tr>
+          <td><a href="{{ url_for('main.domain_detail', domain_id=domain.id) }}">{{ domain.name }}</a></td>
+          <td><span class="badge status-{{ domain.scan_status }}">{{ domain.scan_status }}</span></td>
+          <td>{{ stats.total_urls }}</td>
+          <td>{{ stats.pending }}</td>
+          <td>{{ stats.done }}</td>
+          <td>{{ stats.failed }}</td>
+          <td>{{ stats.successful_submissions }}</td>
+          <td>{{ domain.last_scan_completed_at.strftime('%Y-%m-%d %H:%M') if domain.last_scan_completed_at else "—" }}</td>
+          <td><a href="{{ url_for('main.domain_detail', domain_id=domain.id) }}">Open →</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="9">No domains yet — add one above to start discovery.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </section>
+{% endblock %}

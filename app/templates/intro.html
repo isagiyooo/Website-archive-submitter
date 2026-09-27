@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Website Archive Submitter</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<style>
+.hero{min-height:80vh;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  text-align:center;perspective:1200px;padding:60px 20px;}
+.stack{width:200px;height:140px;position:relative;transform-style:preserve-3d;margin-bottom:40px;
+  animation:spin 14s linear infinite;}
+.card3d{position:absolute;inset:0;border-radius:12px;border:1px solid var(--border);
+  background:linear-gradient(160deg,var(--panel),var(--bg));box-shadow:0 20px 40px rgba(0,0,0,.4);}
+.card3d:nth-child(1){transform:translateZ(30px);}
+.card3d:nth-child(2){transform:translateZ(0px) rotateY(4deg);}
+.card3d:nth-child(3){transform:translateZ(-30px) rotateY(-4deg);}
+.card3d span{position:absolute;bottom:10px;left:14px;font-size:11px;color:var(--accent);letter-spacing:.05em;}
+@keyframes spin{from{transform:rotateY(0deg) rotateX(6deg);}to{transform:rotateY(360deg) rotateX(6deg);}}
+.hero h1{font-size:clamp(28px,5vw,44px);margin:0 0 12px;}
+.hero .tag{color:var(--accent);font-size:13px;letter-spacing:.15em;text-transform:uppercase;margin-bottom:18px;}
+.hero p{max-width:560px;color:var(--muted);line-height:1.6;}
+.cta-row{margin-top:28px;display:flex;gap:12px;}
+.cta-row a.secondary{background:transparent;border:1px solid var(--border);color:var(--text);
+  padding:8px 16px;border-radius:6px;text-decoration:none;}
+.section-inner{max-width:920px;margin:0 auto;padding:40px 20px 60px;}
+.grid3d{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:20px;margin-top:20px;}
+.tilt{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:22px;
+  transition:transform .25s ease,box-shadow .25s ease;}
+.tilt:hover{transform:translateY(-4px);box-shadow:0 18px 30px rgba(0,0,0,.35);}
+.tilt .icon{width:38px;height:38px;border-radius:10px;display:flex;align-items:center;justify-content:center;
+  font-size:18px;margin-bottom:14px;background:#3a2c14;color:var(--accent);}
+.tilt .icon.alt{background:#123a33;color:var(--success);}
+.tilt h3{margin:0 0 8px;font-size:16px;}
+.tilt p{margin:0;font-size:13.5px;color:var(--muted);}
+.steps{display:flex;flex-direction:column;gap:14px;margin-top:20px;}
+.step{display:flex;gap:16px;align-items:flex-start;background:var(--panel);border:1px solid var(--border);
+  border-radius:12px;padding:16px 18px;transition:transform .2s ease;}
+.step:hover{transform:translateX(4px);}
+.step .num{flex:none;width:30px;height:30px;border-radius:50%;background:#3a2c14;color:var(--accent);
+  display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;}
+.step h4{margin:0 0 4px;font-size:14.5px;}
+.step p{margin:0;font-size:13px;color:var(--muted);}
+footer.foot{text-align:center;padding:40px 20px;color:var(--muted);font-size:12.5px;border-top:1px solid var(--border);}
+</style>
+</head>
+<body>
+  <header>
+    <a class="brand" href="{{ url_for('main.intro') }}">📦 Website Archive Submitter</a>
+    <nav>
+      <a href="{{ url_for('main.dashboard') }}">Dashboard</a>
+      <a href="{{ url_for('main.search') }}">Search</a>
+    </nav>
+  </header>
+
+  <section class="hero">
+    <div class="tag">Examination project</div>
+    <div class="stack">
+      <div class="card3d"><span>WAYBACK</span></div>
+      <div class="card3d"><span>QUEUE</span></div>
+      <div class="card3d"><span>CRAWL</span></div>
+    </div>
+    <h1>Website Archive Submitter</h1>
+    <p>An automated pipeline that discovers a website's public pages and permanently preserves them
+       across web-archiving services — with a searchable repository of everything it finds and saves.</p>
+    <div class="cta-row">
+      <a href="{{ url_for('main.dashboard') }}"><button type="button">Enter dashboard →</button></a>
+      <a class="secondary" href="{{ url_for('main.search') }}">Search repository</a>
+    </div>
+  </section>
+
+  <section class="section-inner">
+    <h2>What it does</h2>
+    <p class="muted">Point it at one or more domains. It crawls, cleans up, and archives their public pages
+      automatically — then remembers exactly what it found and what happened to it.</p>
+    <div class="grid3d">
+      <div class="tilt"><div class="icon">◎</div><h3>Discovers</h3>
+        <p>Finds a site's URLs via sitemap, robots.txt, internal links, canonical tags, feeds, and pagination.</p></div>
+      <div class="tilt"><div class="icon alt">⇄</div><h3>Archives</h3>
+        <p>Submits every new URL to the Wayback Machine and archive.today, without bypassing rate limits or CAPTCHAs.</p></div>
+      <div class="tilt"><div class="icon">▤</div><h3>Remembers</h3>
+        <p>Keeps a permanent record of when a page was found, when it was archived, and a link to every snapshot.</p></div>
+      <div class="tilt"><div class="icon alt">↻</div><h3>Resumes</h3>
+        <p>Survives crashes and restarts — an interrupted submission queue always picks back up where it left off.</p></div>
+    </div>
+  </section>
+
+  <section class="section-inner">
+    <h2>How it works</h2>
+    <p class="muted">Six stages, running for one domain or many at once, on a persistent queue rather than a fire-and-forget script.</p>
+    <div class="steps">
+      <div class="step"><div class="num">1</div><div><h4>Add a domain</h4><p>You give it a URL; it registers a new tracked project.</p></div></div>
+      <div class="step"><div class="num">2</div><div><h4>Crawl &amp; discover</h4><p>Sitemaps, robots.txt, and a same-domain link crawl surface every reachable page.</p></div></div>
+      <div class="step"><div class="num">3</div><div><h4>Normalize &amp; dedupe</h4><p>URLs are cleaned up and compared against what's already known, so only genuinely new pages move forward.</p></div></div>
+      <div class="step"><div class="num">4</div><div><h4>Queue for submission</h4><p>New and never-archived URLs are placed on a persistent, resumable queue.</p></div></div>
+      <div class="step"><div class="num">5</div><div><h4>Submit to archives</h4><p>A background worker sends each URL to the Wayback Machine and archive.today, retrying failures with backoff.</p></div></div>
+      <div class="step"><div class="num">6</div><div><h4>Track in the dashboard</h4><p>Every domain's progress, successes, failures, and snapshot links are visible and searchable.</p></div></div>
+    </div>
+  </section>
+
+  <footer class="foot">Flask · SQLAlchemy · SQLite · a persistent queue that never loses your place</footer>
+</body>
+</html>
